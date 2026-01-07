@@ -1,4 +1,4 @@
-# ESP-NOW-Temperature-Humidity-Transmitter-Receiver
+# ESP-NOW-Temperature-Humidity-Transmitter-Receiver for T5 Display
 Using ESP32 with temperature/humidity sensors to read and transmit to a receiver.  Can have 1 inside and multiple outside transmitters.  ESP-NOW for transport.
 
 ________________________________________
@@ -232,7 +232,9 @@ ________________________________________
     •	Automatic reboot: If WiFi or time sync fails beyond threshold.
 
 ________________________________________
-The preceeding was prepared by CoPilot by reading the source and listing main points it considered interesting.  The following was written by the author.  Between all of this, you should get the picture.
+The preceeding was prepared by CoPilot by reading the source and listing main points it considered interesting.  
+
+The following was written by the author.  Between all of this, you should get the picture.
 ________________________________________
 
 This project was started to let me learn about programming and operation of ESP-NOW as a transport mechanism and to end up with a remote sensing thermometer that would send from more than one sensor to central receiver.  I had been wanting an inside and outside thermometer for some time and I found out about ESP-NOW while deciding how to do the communications so I had a chance to use it and learn it.  It turns out to be a very simple protocol with a couple of variations that make it easy to send and receive messages between units. The protocol does not implement resends but you can do that fairly easily with the results of the sends as reported.  To get this information, you must send to a fixed MAC address.  If you want to broadcast to all receivers in the area, you lose the feedback about the success of the send.  This is only natural since there are multiple receivers listening and reporting the reception status of each one could be quite a bit of overhead.
