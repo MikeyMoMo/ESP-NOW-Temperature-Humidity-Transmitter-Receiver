@@ -121,7 +121,7 @@ ________________________________________
 
     •	Multi transmitter support: 
 
-      o	Designed for two transmitters (Inside and Outside), indexed starting at 1 for clarity.
+      o	Designed for up to 9 transmitters (Inside(1) and Outside(up to 8), indexed starting at 0 for clarity.
 
     •	Data handling: 
 
@@ -149,11 +149,11 @@ ________________________________________
 
       o	Tracks minimum and maximum temperatures over a 24 hour rolling window.
 
-      o	Computes dew point from outside readings.
+      o	Computes current dew point from outside readings.
 
     •	Display output: 
 
-      o	Shows Inside and Outside readings on the T5 ePaper.
+      o	Shows Inside and Outside readings on the CYD Display.  Touch is activated but does nothing useful at present.
 
       o	Updates every 5 minutes during the day, hourly at night.
 
@@ -181,10 +181,6 @@ ________________________________________
 
       o	vector (C++ STL)
 
-    o	GFX_Setups (for T5 ePaper display)
-
-      •	Custom headers: 
-
     o	Definitions.h
 
     o	Utilities.h
@@ -193,7 +189,7 @@ ________________________________________
 
 🚀 Usage
 
-    1.	Flash the sketch to a LilyGO T5 v2.13 (ESP32 with ePaper).
+    1.	Flash the sketch to a CYD board with touch (functinality to be added).
 
     2.	Configure transmitter MAC addresses (e.g., insideMAC) to match your hardware.
 
@@ -232,7 +228,7 @@ ________________________________________
     •	Automatic reboot: If WiFi or time sync fails beyond threshold.
 
 ________________________________________
-The preceeding was prepared by CoPilot by reading the source and listing main points it considered interesting.  
+The preceeding was prepared by CoPilot and checked/modified by me, by reading the source and listing main points it considered interesting.  
 
 The following was written by the author.  Between all of this, you should get the picture.
 ________________________________________
@@ -255,7 +251,7 @@ The other thing that was new to me on this project is the use of the C++ vector 
 
 There is one unusual thing done in this program.  It was said that this does not work but, in fact, it does work on the Arduino IDE, both versions 1 and 2.  That is a relative include for a common file that the transmitter and receiver need.  I wanted a single copy so it could not get out of sync.  The file is located in the folder above the two folders for the transmitter and receiver code.  It is included thus:
 
-#include "../CommonFile_v2.h".  
+#include "../CommonFile_v4.h".  
 
 Nominally, this is done in a fake library in the libraries folder under the sketch folder name but that's additional installation overhead and I tried this and it works.
 
@@ -285,11 +281,9 @@ Setup does all of the regular stuff including getting the display prepped, Wifi 
 
 Loop is where the displaying up the results is done.  All of the variables are setup in Loop, then a display update routine is called to show it on whatever display is desired.  As delivered, it is an ePaper display on a LilyGo T5 v2.13.  To change to a different display, just replace this display formatting routine (last statement in Loop).
 
-The Utilities tab is where all of the hard work is done.  deduceOffsets gets the offsets and other information from the time string as input.  Later, the offset is applied to the epoch to get standard time or the localTime routine is called.  addReading pushes the current reading onto the end of the outdoor vector.  Indoor temps of not saved, only displayed.  printVector is a utility to show the contenct of the readings vector.  OnDataRecv is called when a packet has been received for processing.  It checks the packet sequence number to be sure this is not a repeat and recalculates and compares the CRC8, rejecting the packet if either of these is not what they should be.  It also sets a boolean to show it is running to minimize the mixing of prints from this routine which can run at any time and the loop routine that runs at a varying schedule.  If you have SHOW_DETAILS defined, there is additional output and I prefer to keep them separate.
+The Utilities tab is where all of the hard work is done.  deduceOffsets gets the offsets and other information from the time string as input. Later, the offset is applied to the epoch to get standard time or the localTime routine is called.  addReading pushes the current reading onto the end of the outdoor vector.  Indoor temps of not saved, only displayed.  printVector is a utility to show the contenct of the readings vector.  OnDataRecv is called when a packet has been received for processing.  It checks the packet sequence number to be sure this is not a repeat and recalculates and compares the CRC8, rejecting the packet if either of these is not what they should be.  It also sets a boolean to show it is running to minimize the mixing of prints from this routine which can run at any time and the loop routine that runs at a varying schedule.  If you have SHOW_DETAILS defined, there is additional output and I prefer to keep them separate.
 
 timtimeSyncCallback is run when a new time is received in response to a timed fetch by the sNTP library code.  It is there just to verify that a new time hack has been received.  IinitTime makes sure that the time is valid before exiting so that nothing will run with a wrong time epoch.  getMinTemp and getMaxTemp do exactly what they say.  The read through the readings vector and fine min and max temps.  Remember that the vector is trimmed to only have 24 hours or readings in it.  CONFIG_FOR_JOE changes the WAP credentials and displays temperature in F instead of C degrees.
-
-It takes a very long time for the first compile pass of this code with all of the ePaper support code.  Maybe I will find something simpler but I don't think that will happen.  If you change to a different display, remove all of GXEDP2 stuff unless you need it for the display you are using.  That might make the compile faster.
 
 Enjoy,
 Mikey the Midnight Coder (and, sometimes, in the daytime, too!)
